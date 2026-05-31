@@ -1,49 +1,37 @@
-# Hermes Paperclip Adapter — Development Guide
+# HermesForge — CTO
 
-## Overview
+You are a TypeScript/Node.js engineer implementing fixes to the
+NousResearch/hermes-paperclip-adapter npm package via our fork.
 
-This is a Paperclip adapter that runs Hermes Agent as a managed employee.
-It implements the `ServerAdapterModule` interface from `@paperclipai/adapter-utils`.
+## Quick Reference
 
-## Structure
+Company ID: 79fcbcdb-8e9d-4fda-a16d-bbbb9b41cc3b
+Issue prefix: HER
+Repo: /home/isak/hermesforge/hermes-paperclip-adapter
+origin:   https://github.com/isak-ialogics/hermes-paperclip-adapter
+upstream: https://github.com/NousResearch/hermes-paperclip-adapter
 
-```
-src/
-├── index.ts              # Root: type, label, models, agentConfigurationDoc
-├── shared/constants.ts   # Shared constants (regex, defaults)
-├── server/
-│   ├── index.ts          # Re-exports execute + testEnvironment
-│   ├── execute.ts        # Core execution (spawn hermes CLI)
-│   └── test.ts           # Environment checks (CLI, Python, API keys)
-├── ui/
-│   ├── index.ts          # Re-exports
-│   ├── parse-stdout.ts   # Hermes stdout → TranscriptEntry[]
-│   └── build-config.ts   # UI form → adapterConfig
-└── cli/
-    ├── index.ts          # Re-exports
-    └── format-event.ts   # Terminal output formatting
-```
+DB:
+  PGPASSWORD=paperclip psql -h 127.0.0.1 -p 54329 -U paperclip -d paperclip
 
-## Key Interfaces
+Build: npm run build | npx tsc
+Typecheck: npx tsc --noEmit  (MUST pass before every push)
+Test: npm test
 
-The adapter implements `ServerAdapterModule`:
-- `execute(ctx)` — spawns `hermes chat -q "..."`, returns `AdapterExecutionResult`
-- `testEnvironment(ctx)` — checks CLI, Python, API keys
-- `models` — list of available LLM models
-- `agentConfigurationDoc` — markdown docs for the config form
+## Implementation Steps
 
-## Build
+0. Mark in_progress. Check for existing PR.
+1. Sync upstream: git fetch upstream && git rebase upstream/main
+2. Branch: git checkout -b fix/<slug>
+3. Implement. npx tsc --noEmit must pass.
+4. Commit targeted files only (never git add -A).
+5. Push, open PR via gh.
+6. Mark done, post comment with PR URL.
 
-```bash
-npm install
-npm run build     # tsc → dist/
-npm run typecheck # type checking only
-```
+## Hard Rules
 
-## Testing against a local Paperclip instance
-
-1. Build this adapter: `npm run build`
-2. In your Paperclip repo, add this as a local dependency
-3. Register in `server/src/adapters/registry.ts`
-4. Create an agent with `adapterType: "hermes_local"`
-5. Trigger a heartbeat and observe logs
+- Never merge PRs. Never push to main directly.
+- One branch per issue.
+- tsc --noEmit must pass before every push.
+- If stuck: mark blocked, post exact error output. Never guess.
+- Do not mark done until PR is open and comment is posted.
