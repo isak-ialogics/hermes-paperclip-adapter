@@ -139,7 +139,7 @@ Address the comment, POST a reply if needed, then continue working.
 ## Heartbeat Wake — Check for Work
 
 1. List ALL open issues assigned to you (todo, backlog, in_progress):
-   \`curl -s "{{paperclipApiUrl}}/companies/{{companyId}}/issues?assigneeAgentId={{agentId}}" -H "Authorization: Bearer $PAPERCLIP_API_KEY" -o /tmp/pclip_issues.json && python3 -c "import json;issues=json.load(open('/tmp/pclip_issues.json'));[print(f'{i[\\\"identifier\\\"]} {i[\\\"status\\\"]:>12} {i[\\\"priority\\\"]:>6} {i[\\\"title\\\"]}') for i in issues if i['status'] not in ('done','cancelled')]" \`
+   \`curl -s "{{paperclipApiUrl}}/companies/{{companyId}}/issues?assigneeAgentId={{agentId}}" -H "Authorization: Bearer $PAPER...KEY" -o /tmp/pclip_issues.json && jq -r '.[] | select(.status != "done" and .status != "cancelled") | "\(.identifier) \(.status | tostring | ljust(12)) \(.priority | tostring | ljust(6)) \(.title)"' /tmp/pclip_issues.json \`
 
 2. If issues found, pick the highest priority one that is not done/cancelled and work on it:
    - Read the issue details: \`curl -s "{{paperclipApiUrl}}/issues/ISSUE_ID" -H "Authorization: Bearer $PAPERCLIP_API_KEY"\`
@@ -147,7 +147,7 @@ Address the comment, POST a reply if needed, then continue working.
    - When done, mark complete and post a comment (see Workflow steps 2-4 above)
 
 3. If no issues assigned to you, check for unassigned issues:
-   \`curl -s "{{paperclipApiUrl}}/companies/{{companyId}}/issues?status=backlog" -H "Authorization: Bearer $PAPERCLIP_API_KEY" -o /tmp/pclip_unassigned.json && python3 -c "import json;issues=json.load(open('/tmp/pclip_unassigned.json'));[print(f'{i[\\\"identifier\\\"]} {i[\\\"title\\\"]}') for i in issues if not i.get('assigneeAgentId')]" \`
+   \`curl -s "{{paperclipApiUrl}}/companies/{{companyId}}/issues?status=backlog" -H "Authorization: Bearer $PAPER...KEY" -o /tmp/pclip_unassigned.json && jq -r '.[] | select(.assigneeAgentId == null or .assigneeAgentId == "") | "\(.identifier) \(.title)"' /tmp/pclip_unassigned.json \`
    If you find a relevant issue, assign it to yourself:
    \`curl -s -X PATCH "{{paperclipApiUrl}}/issues/ISSUE_ID" -H "Content-Type: application/json" -H "Authorization: Bearer $PAPERCLIP_API_KEY" -H "X-Paperclip-Run-Id: $PAPERCLIP_RUN_ID" -d '{"assigneeAgentId":"{{agentId}}","status":"todo"}'\`
 
