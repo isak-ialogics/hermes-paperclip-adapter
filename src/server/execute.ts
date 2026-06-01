@@ -1174,7 +1174,7 @@ export async function execute(
   // Without this, the Paperclip auth middleware falls back to "local_implicit"
   // board user, and all issue comments appear attributed to "You" instead of
   // the agent.  The Claude/Codex adapters follow the same pattern.
-  const userEnv = config.env as Record<string, string> | undefined;
+  const userEnv = config.env as Record<string, string | { type: string; value: string } | unknown> | undefined;
   const hasExplicitApiKey = typeof userEnv?.PAPERCLIP_API_KEY === "string" && userEnv.PAPERCLIP_API_KEY.trim().length > 0;
   if (!hasExplicitApiKey && ctx.authToken) {
     env.PAPERCLIP_API_KEY = ctx.authToken;
@@ -1187,7 +1187,11 @@ export async function execute(
 
   const userEnvFinal = userEnv;
   if (userEnvFinal && typeof userEnvFinal === "object") {
-    Object.assign(env, userEnvFinal);
+    const unwrapped: Record<string, string> = {};
+    for (const [k, v] of Object.entries(userEnvFinal)) {
+      unwrapped[k] = typeof v === "object" && v !== null && "value" in v ? String(v.value) : String(v);
+    }
+    Object.assign(env, unwrapped);
   }
 
   // ── Resolve working directory ──────────────────────────────────────────
