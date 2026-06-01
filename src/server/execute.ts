@@ -1187,7 +1187,19 @@ export async function execute(
 
   const userEnvFinal = userEnv;
   if (userEnvFinal && typeof userEnvFinal === "object") {
-    Object.assign(env, userEnvFinal);
+    for (const [key, rawVal] of Object.entries(userEnvFinal)) {
+      if (rawVal == null) continue;
+      // Paperclip adapterConfig.env may wrap values as {type, value}.
+      // Flatten to just the value string so subprocess env gets the real value,
+      // not "[object Object]". (Fixes HER-71, HER-27)
+      const val =
+        typeof rawVal === "object" && !Array.isArray(rawVal) && "value" in rawVal
+          ? String((rawVal as Record<string, unknown>).value ?? "")
+          : String(rawVal);
+      if (val) {
+        env[key] = val;
+      }
+    }
   }
 
   // ── Resolve working directory ──────────────────────────────────────────
