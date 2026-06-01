@@ -922,7 +922,7 @@ export async function execute(
   const config = (ctx.config ?? ctx.agent?.adapterConfig ?? {}) as Record<string, unknown>;
 
   // ── Resolve configuration ──────────────────────────────────────────────
-  const hermesCmd = cfgString(config.hermesCommand) || HERMES_CLI;
+  const hermesCmd = cfgString(config.hermesCommand) || cfgString(config.command) || HERMES_CLI;
   const toolsets = cfgString(config.toolsets) || cfgStringArray(config.enabledToolsets)?.join(",");
   const extraArgs = cfgStringArray(config.extraArgs);
   const maxTurns = cfgNumber(config.maxTurnsPerRun);
