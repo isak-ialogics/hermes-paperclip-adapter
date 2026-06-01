@@ -44,6 +44,7 @@ export const VALID_PROVIDERS = [
   "minimax",
   "minimax-cn",
   "kilocode",
+  "x-ai",
 ] as const;
 
 /**
@@ -84,6 +85,9 @@ export const MODEL_PREFIX_PROVIDER_HINTS: [string, string][] = [
   ["mistral", "auto"],
   // HuggingFace models (org/model format)
   ["huggingface/", "huggingface"],
+  // xAI / Grok models
+  ["grok", "x-ai"],
+  ["x-ai/", "x-ai"],
 ];
 
 /** Regex to extract session ID from Hermes CLI output. */
@@ -188,6 +192,7 @@ export const PROVIDER_LABELS: Record<string, string> = {
   minimax: "MiniMax",
   "minimax-cn": "MiniMax (China)",
   kilocode: "Kilo Code",
+  "x-ai": "xAI / Grok",
 };
 
 /**
